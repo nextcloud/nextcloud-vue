@@ -70,6 +70,30 @@ export default {
 }
 </script>
 ```
+
+### Timezone-aware date picker
+```vue
+<template>
+	<span>
+		<DatetimePicker
+			v-model="time"
+			type="datetime"
+			:show-timezone-select="true"
+			:timezone-id.sync="tz" />
+		{{ time }} | {{ tz }}
+	</span>
+</template>
+<script>
+export default {
+	data() {
+		return {
+			time: null,
+			tz: 'Hawaiian Standard Time',
+		}
+	},
+}
+</script>
+```
 </docs>
 
 <template>
@@ -89,6 +113,26 @@ export default {
 		@select-year="handleSelectYear"
 		@select-month="handleSelectMonth"
 		@update:value="$emit('update:value', value)">
+		<template v-if="showTimezoneSelect" #icon-calendar>
+			<button
+				class="datetime-picker-inline-icon icon-timezone icon"
+				:class="{'datetime-picker-inline-icon--highlighted': highlightTimezone}"
+				@click.stop.prevent="toggleTimezonePopover"
+				@mousedown.stop.prevent="() => {}" />
+			<Popover
+				:open.sync="showTimezonePopover"
+				open-class="timezone-popover-wrapper">
+				<div class="timezone-popover-wrapper__title">
+					<strong>
+						{{ t('Please select a timezone:') }}
+					</strong>
+				</div>
+				<TimezoneSelect
+					class="timezone-popover-wrapper__timezone-select"
+					v-model="tzVal"
+					@change="this.$emit('update:timezone-id', arguments[0])" />
+			</Popover>
+		</template>
 		<template v-for="(_, slot) of $scopedSlots" #[slot]="scope">
 			<slot :name="slot" v-bind="scope" />
 		</template>
@@ -98,11 +142,16 @@ export default {
 <script>
 import DatePicker from 'vue2-datepicker'
 
+import Popover from '../Popover/index'
+import TimezoneSelect from '../TimezonePicker'
+
 export default {
 	name: 'DatetimePicker',
 
 	components: {
 		DatePicker,
+		Popover,
+		TimezoneSelect,
 	},
 
 	inheritAttrs: false,
@@ -156,6 +205,21 @@ export default {
 			},
 		},
 
+		timezoneId: {
+			type: String,
+			default: 'floating'
+		},
+
+		showTimezoneSelect: {
+			type: Boolean,
+			default: false,
+		},
+
+		highlightTimezone: {
+			type: Boolean,
+			default: false,
+		},
+
 		appendToBody: {
 			type: Boolean,
 			default: false,
@@ -165,6 +229,13 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+	},
+
+	data() {
+		return {
+			showTimezonePopover: false,
+			tzVal: this.timezoneId
+		}
 	},
 
 	methods: {
@@ -179,6 +250,7 @@ export default {
 				}
 			}
 		},
+
 		handleSelectMonth(month) {
 			const value = this.$refs.datepicker.currentValue
 			if (value) {
@@ -190,6 +262,38 @@ export default {
 				}
 			}
 		},
+
+		/**
+		 * Toggles the visibility of the timezone popover
+		 */
+		toggleTimezonePopover() {
+			if (!this.showTimezoneSelect) {
+				// Just a click on the icon, but not for timezones -> ignore
+				return
+			}
+
+			this.showTimezonePopover = !this.showTimezonePopover
+		},
 	},
 }
 </script>
+
+<style lang="scss" scoped>
+.datetime-picker-inline-icon {
+	margin-top: 17px;
+	opacity: .3;
+	border: none;
+	background-color: transparent;
+	border-radius: 0;
+	padding: 6px !important;
+
+	&--highlighted {
+		opacity: .7;
+	}
+
+	&:focus,
+	&:hover {
+		opacity: 1;
+	}
+}
+</style>
