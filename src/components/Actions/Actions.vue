@@ -161,7 +161,8 @@ export default {
 	<div v-else
 		v-show="hasMultipleActions || forceMenu"
 		:class="{'action-item--open': opened}"
-		class="action-item">
+		class="action-item"
+		@click.stop="">
 		<!-- If more than one action, create a popovermenu -->
 		<Popover
 			:delay="0"
