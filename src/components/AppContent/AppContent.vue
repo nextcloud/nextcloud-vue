@@ -326,6 +326,8 @@ export default {
 	// Overriding server styles TODO: cleanup!
 	margin: 0 !important;
 	background-color: var(--color-main-background);
+	// Make the topbar margin variable available to AppContent children
+	--topbar-margin: $topbar-margin: 4px;
 }
 
 // Mobile list/details handling
