@@ -207,7 +207,7 @@ export default {
 
 		timezoneId: {
 			type: String,
-			default: 'floating'
+			default: 'UTC'
 		},
 
 		showTimezoneSelect: {
