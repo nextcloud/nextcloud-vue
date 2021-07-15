@@ -79,7 +79,7 @@ export default {
 			v-model="time"
 			type="datetime"
 			:show-timezone-select="true"
-			:timezone-id.sync="tz" />
+			:timezone-id.sync="tz" /><br>
 		{{ time }} | {{ tz }}
 	</span>
 </template>
@@ -87,8 +87,8 @@ export default {
 export default {
 	data() {
 		return {
-			time: null,
-			tz: 'Hawaiian Standard Time',
+			time: undefined,
+			tz: 'Europe/Berlin',
 		}
 	},
 }
@@ -114,23 +114,23 @@ export default {
 		@select-month="handleSelectMonth"
 		@update:value="$emit('update:value', value)">
 		<template v-if="showTimezoneSelect" #icon-calendar>
-			<button
-				class="datetime-picker-inline-icon icon-timezone icon"
-				:class="{'datetime-picker-inline-icon--highlighted': highlightTimezone}"
-				@click.stop.prevent="toggleTimezonePopover"
-				@mousedown.stop.prevent="() => {}" />
 			<Popover
 				:open.sync="showTimezonePopover"
 				open-class="timezone-popover-wrapper">
+				<button slot="trigger"
+					class="datetime-picker-inline-icon icon-timezone icon"
+					:class="{'datetime-picker-inline-icon--highlighted': highlightTimezone}"
+					@mousedown.stop.prevent="() => {}" />
+
 				<div class="timezone-popover-wrapper__title">
 					<strong>
 						{{ t('Please select a timezone:') }}
 					</strong>
 				</div>
-				<TimezoneSelect
-					class="timezone-popover-wrapper__timezone-select"
+				<TimezonePicker
 					v-model="tzVal"
-					@change="this.$emit('update:timezone-id', arguments[0])" />
+					class="timezone-popover-wrapper__timezone-select"
+					@input="$emit('update:timezone-id', arguments[0])" />
 			</Popover>
 		</template>
 		<template v-for="(_, slot) of $scopedSlots" #[slot]="scope">
@@ -143,7 +143,7 @@ export default {
 import DatePicker from 'vue2-datepicker'
 
 import Popover from '../Popover/index'
-import TimezoneSelect from '../TimezonePicker'
+import TimezonePicker from '../TimezonePicker'
 
 export default {
 	name: 'DatetimePicker',
@@ -151,7 +151,7 @@ export default {
 	components: {
 		DatePicker,
 		Popover,
-		TimezoneSelect,
+		TimezonePicker,
 	},
 
 	inheritAttrs: false,
@@ -207,7 +207,7 @@ export default {
 
 		timezoneId: {
 			type: String,
-			default: 'UTC'
+			default: 'UTC',
 		},
 
 		showTimezoneSelect: {
@@ -234,7 +234,7 @@ export default {
 	data() {
 		return {
 			showTimezonePopover: false,
-			tzVal: this.timezoneId
+			tzVal: this.timezoneId,
 		}
 	},
 
@@ -280,7 +280,6 @@ export default {
 
 <style lang="scss" scoped>
 .datetime-picker-inline-icon {
-	margin-top: 17px;
 	opacity: .3;
 	border: none;
 	background-color: transparent;
