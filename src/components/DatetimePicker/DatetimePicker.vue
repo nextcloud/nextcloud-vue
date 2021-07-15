@@ -72,6 +72,10 @@ export default {
 ```
 
 ### Timezone-aware date picker
+
+The datepicker can optionally include a picker for the preferred timezone. The selected time does not factor in the
+picked timezone, but you will have to convert it yourself when necessary.
+
 ```vue
 <template>
 	<span>
@@ -198,6 +202,11 @@ export default {
 			},
 		},
 
+		/**
+		 * The value to initialize, but also two-way bind the selected date. The date is – like the `Date` object in
+		 * JavaScript – tied to UTC. The selected timezone does not have an influence of the selected time and date
+		 * value. You have to translate the time yourself when you want to factor in timezones.
+		 */
 		// eslint-disable-next-line
 		value: {
 			default() {
@@ -205,6 +214,9 @@ export default {
 			},
 		},
 
+		/**
+		 * The preselected IANA timezone ID for the timezone picker, only relevant in combination with `:show-timezone-select="true"`. Example: `Europe/Berlin`. The prop supports two-way binding through the .sync modifier.
+		 */
 		timezoneId: {
 			type: String,
 			default: 'UTC',
